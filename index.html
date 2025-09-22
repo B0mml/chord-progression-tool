@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chord Progression Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: #2b2b2b;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .controls label {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .controls select {
+            background-color: #444;
+            color: #e0e0e0;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #555;
+            appearance: none;
+            cursor: pointer;
+            text-align: center;
+            width: 150px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            background-color: #444;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .mode-toggle button {
+            padding: 0.5rem 1rem;
+            background-color: transparent;
+            color: #e0e0e0;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .mode-toggle button.active {
+            background-color: #666;
+            font-weight: bold;
+        }
+
+        .chord-section {
+            background-color: #383838;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chord-title {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .chord-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .chord-item {
+            background-color: #4a4a4a;
+            color: #e0e0e0;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            text-align: center;
+            min-width: 75px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            padding-top: 1.5rem;
+        }
+
+        .chord-roman {
+            position: absolute;
+            top: 0.25rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #a0a0a0;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white">
+
+    <div class="container mx-auto p-6">
+        <div class="controls">
+            <div>
+                <label for="key-select">Key</label><br>
+                <select id="key-select">
+                    <option value="C">C</option>
+                    <option value="C#">C#</option>
+                    <option value="Db">Db</option>
+                    <option value="D">D</option>
+                    <option value="Eb">Eb</option>
+                    <option value="E">E</option>
+                    <option value="F">F</option>
+                    <option value="F#">F#</option>
+                    <option value="Gb">Gb</option>
+                    <option value="G">G</option>
+                    <option value="Ab">Ab</option>
+                    <option value="A">A</option>
+                    <option value="Bb">Bb</option>
+                    <option value="B">B</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Mode</label><br>
+                <div class="mode-toggle">
+                    <button id="major-btn" class="active">Major</button>
+                    <button id="minor-btn">Minor</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="chord-section">
+            <div class="chord-title">Main Chords</div>
+            <div id="main-chords-grid" class="chord-grid"></div>
+        </div>
+
+        <div class="chord-section">
+            <div class="chord-title" id="secondary-v-title">Secondary Dominants</div>
+            <div id="secondary-v-grid" class="chord-grid"></div>
+        </div>
+
+        <div class="chord-section">
+            <div class="chord-title" id="secondary-iv-title">Modal Interchange</div>
+            <div id="secondary-iv-grid" class="chord-grid"></div>
+        </div>
+
+        <div class="chord-section">
+            <div class="chord-title" id="neapolitan-title">Neapolitan 6th</div>
+            <div id="neapolitan-grid" class="chord-grid"></div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="chord-section mt-6">
+            <div class="chord-title">Tips</div>
+            <div id="tips-content">
+                <!-- Tips will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const keySelect = document.getElementById('key-select');
+        const majorBtn = document.getElementById('major-btn');
+        const minorBtn = document.getElementById('minor-btn');
+        const mainChordsGrid = document.getElementById('main-chords-grid');
+        const secondaryVGrid = document.getElementById('secondary-v-grid');
+        const secondaryIvGrid = document.getElementById('secondary-iv-grid');
+        const neapolitanGrid = document.getElementById('neapolitan-grid');
+        const tipsContent = document.getElementById('tips-content');
+
+        // Title elements
+        const secondaryVTitle = document.getElementById('secondary-v-title');
+        const secondaryIvTitle = document.getElementById('secondary-iv-title');
+        const neapolitanTitle = document.getElementById('neapolitan-title');
+
+        let currentMode = 'major';
+
+        const chromaticScale = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+        const majorScales = {
+            'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+            'C#': ['C#', 'D#', 'E#', 'F#', 'G#', 'A#', 'B#'],
+            'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C'],
+            'D': ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
+            'Eb': ['Eb', 'F', 'G', 'Ab', 'Bb', 'C', 'D'],
+            'E': ['E', 'F#', 'G#', 'A', 'B', 'C#', 'D#'],
+            'F': ['F', 'G', 'A', 'Bb', 'C', 'D', 'E'],
+            'F#': ['F#', 'G#', 'A#', 'B', 'C#', 'D#', 'E#'],
+            'Gb': ['Gb', 'Ab', 'Bb', 'Cb', 'Db', 'Eb', 'F'],
+            'G': ['G', 'A', 'B', 'C', 'D', 'E', 'F#'],
+            'Ab': ['Ab', 'Bb', 'C', 'Db', 'Eb', 'F', 'G'],
+            'A': ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#'],
+            'Bb': ['Bb', 'C', 'D', 'Eb', 'F', 'G', 'A'],
+            'B': ['B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#']
+        };
+
+        const minorScales = {
+            'C': ['C', 'D', 'Eb', 'F', 'G', 'Ab', 'Bb'],
+            'C#': ['C#', 'D#', 'E', 'F#', 'G#', 'A', 'B'],
+            'Db': ['Db', 'Eb', 'Fb', 'Gb', 'Ab', 'Bbb', 'Cb'],
+            'D': ['D', 'E', 'F', 'G', 'A', 'Bb', 'C'],
+            'Eb': ['Eb', 'F', 'Gb', 'Ab', 'Bb', 'Cb', 'Db'],
+            'E': ['E', 'F#', 'G', 'A', 'B', 'C', 'D'],
+            'F': ['F', 'G', 'Ab', 'Bb', 'C', 'Db', 'Eb'],
+            'F#': ['F#', 'G#', 'A', 'B', 'C#', 'D', 'E'],
+            'Gb': ['Gb', 'Ab', 'Bbb', 'Cb', 'Db', 'Ebb', 'Fb'],
+            'G': ['G', 'A', 'Bb', 'C', 'D', 'Eb', 'F'],
+            'Ab': ['Ab', 'Bb', 'Cb', 'Db', 'Eb', 'Fb', 'Gb'],
+            'A': ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+            'Bb': ['Bb', 'C', 'Db', 'Eb', 'F', 'Gb', 'Ab'],
+            'B': ['B', 'C#', 'D', 'E', 'F#', 'G', 'A']
+        };
+
+        function simplify(note) {
+            const enharmonicMap = {
+                'E#': 'F', 'Cb': 'B', 'B#': 'C', 'Fb': 'E',
+                'Bb': 'A#', 'Eb': 'D#', 'Ab': 'G#', 'Db': 'C#', 'Gb': 'F#',
+                'Bbb': 'A', 'Ebb': 'D'
+            };
+            return enharmonicMap[note] || note;
+        }
+
+        function getDominantSeventh(note) {
+            const index = chromaticScale.indexOf(simplify(note));
+            const dominantIndex = (index + 7) % 12;
+            const dominantNote = chromaticScale[dominantIndex];
+            return `${dominantNote}7`;
+        }
+
+        function getDiminishedSeventh(note) {
+            const baseNote = simplify(note);
+            return baseNote + '°7';
+        }
+
+        function getNeapolitanSixth(key) {
+            const tonic = chromaticScale.indexOf(simplify(key));
+            const flatII = chromaticScale[(tonic + 1) % 12];
+            return flatII + '6'; // Neapolitan 6th
+        }
+
+        function getMajorChords(key) {
+            const majorScaleNotes = majorScales[key];
+            const minorScaleNotes = minorScales[key];
+
+            const mainChords = [
+                { note: majorScaleNotes[0], numeral: 'I' },
+                { note: majorScaleNotes[1] + 'm', numeral: 'ii' },
+                { note: majorScaleNotes[2] + 'm', numeral: 'iii' },
+                { note: majorScaleNotes[3], numeral: 'IV' },
+                { note: majorScaleNotes[4], numeral: 'V' },
+                { note: majorScaleNotes[5] + 'm', numeral: 'vi' }
+            ];
+
+            const secondaryDominants = [
+                { note: getDominantSeventh(majorScaleNotes[0]), numeral: 'V7/I' },
+                { note: getDominantSeventh(majorScaleNotes[1]), numeral: 'V7/ii' },
+                { note: getDominantSeventh(majorScaleNotes[2]), numeral: 'V7/iii' },
+                { note: getDominantSeventh(majorScaleNotes[3]), numeral: 'V7/IV' },
+                { note: getDominantSeventh(majorScaleNotes[4]), numeral: 'V7/V' },
+                { note: getDominantSeventh(majorScaleNotes[5]), numeral: 'V7/vi' }
+            ];
+
+            const modalInterchange = [
+                { note: minorScaleNotes[2], numeral: '♭III' },
+                { note: minorScaleNotes[5], numeral: '♭VI' },
+                { note: minorScaleNotes[3] + 'm', numeral: 'iv' },
+                { note: minorScaleNotes[6], numeral: '♭VII' }
+            ];
+
+            const neapolitan = [];
+
+            return { mainChords, secondaryDominants, modalInterchange, neapolitan };
+        }
+
+        function getMinorChords(key) {
+            const naturalMinor = minorScales[key];
+            const tonicIndex = chromaticScale.indexOf(simplify(key));
+
+            const mainChords = [
+                { note: naturalMinor[0] + 'm', numeral: 'i' },
+                { note: naturalMinor[1] + '°', numeral: 'ii°' },
+                { note: naturalMinor[2] + '+', numeral: 'III+' },
+                { note: naturalMinor[3] + 'm', numeral: 'iv' },
+                { note: getDominantSeventh(naturalMinor[4]), numeral: 'V7' },
+                { note: naturalMinor[5], numeral: '♭VI' },
+                { note: naturalMinor[6], numeral: '♭VII' }
+            ];
+
+            // Secondary diminished V
+            const fourthDegreeSharp = chromaticScale[(tonicIndex + 6) % 12];
+            const secondaryDimV = [
+                { note: getDiminishedSeventh(fourthDegreeSharp), numeral: 'vii°7/V' }
+            ];
+
+            // Secondary diminished iv + bVI
+            const thirdDegreeSharp = chromaticScale[(tonicIndex + 4) % 12];
+            const secondaryDimIv = [
+                { note: getDiminishedSeventh(thirdDegreeSharp), numeral: 'vii°7/iv' },
+                { note: naturalMinor[5], numeral: '♭VI' }
+            ];
+
+            // Neapolitan 6th
+            const neapolitan = [
+                { note: getNeapolitanSixth(key), numeral: '♭II6' }
+            ];
+
+            return {
+                mainChords,
+                secondaryDominants: secondaryDimV,
+                modalInterchange: secondaryDimIv,
+                neapolitan
+            };
+        }
+
+        function updateTitles() {
+            if (currentMode === 'major') {
+                secondaryVTitle.textContent = 'Secondary Dominants';
+                secondaryIvTitle.textContent = 'Modal Interchange';
+                neapolitanTitle.textContent = '';
+                neapolitanGrid.parentElement.style.display = 'none';
+            } else {
+                secondaryVTitle.textContent = 'Secondary Diminished V';
+                secondaryIvTitle.textContent = 'Secondary Diminished iv, ♭VI';
+                neapolitanTitle.textContent = 'Neapolitan 6th';
+                neapolitanGrid.parentElement.style.display = 'block';
+            }
+        }
+
+        function updateTips() {
+            if (currentMode === 'major') {
+                tipsContent.innerHTML = `
+                    <ul class="list-disc list-inside space-y-2 text-sm text-gray-400">
+                        <li><span class="font-bold text-red-400">Avoid mixing Secondary Dominants</span> within a single progression. They function as temporary transitions rather than part of the main chord progression.</li>
+                        <li>You can transition from any <strong>Main Chord</strong> to any <strong>Secondary Dominant</strong>.</li>
+                        <li>After a <strong>Secondary Dominant</strong>, you should resolve to its relative <strong>Main Chord</strong>. For example, from <strong>V7/ii</strong> you would go to <strong>ii</strong>.</li>
+                        <li>When using <strong>Modal Interchange</strong> chords, they can lead back to the <strong>I</strong>, <strong>IV</strong>, or <strong>V</strong> chords in the main key.</li>
+                        <li>You can also move from any <strong>Main Chord</strong> to a <strong>Modal Interchange</strong> chord, and then back again.</li>
+                        <li>It's ok to <strong>mix</strong> modal interchange chords, as they all come from the same parallel key.</li>
+                    </ul>
+                `;
+            } else {
+                tipsContent.innerHTML = `
+                    <ul class="list-disc list-inside space-y-2 text-sm text-gray-400">
+                        <li><strong>Secondary Diminished V:</strong> These chords (like vii°7/V) create strong pull to the <strong>V7</strong> chord. For example, in A minor: D#°7 → E7 → Am.</li>
+                        <li><strong>Secondary Diminished iv:</strong> These chords lead to the <strong>iv</strong> chord. For example, in A minor: G#°7 → Dm.</li>
+                        <li>The <strong>♭VI</strong> chord (like F in A minor) is very common and can lead back to <strong>i</strong>, <strong>iv</strong>, or <strong>V7</strong>.</li>
+                        <li>The <strong>Neapolitan 6th</strong> (♭II6) is typically used before <strong>V7</strong>. In A minor: Bb6 → E7 → Am.</li>
+                        <li><strong>Common progressions:</strong> i - ♭VI - ♭VII - i, i - iv - V7 - i, i - ♭II6 - V7 - i</li>
+                        <li>The <strong>raised 7th degree</strong> in harmonic minor creates the leading tone, making V7 → i resolution stronger.</li>
+                        <li>You can mix chords from natural minor (♭VII) with harmonic minor (V7) for variety.</li>
+                        <li><strong>Circle of fifths:</strong> iv - ♭VII - ♭III - ♭VI works well in minor keys.</li>
+                    </ul>
+                `;
+            }
+        }
+
+        function renderChords(container, chords) {
+            container.innerHTML = '';
+            chords.forEach(chord => {
+                const item = document.createElement('div');
+                item.className = 'chord-item';
+
+                const romanNumeral = document.createElement('div');
+                romanNumeral.className = 'chord-roman';
+                romanNumeral.textContent = chord.numeral;
+
+                const chordNote = document.createElement('span');
+                chordNote.textContent = chord.note;
+
+                item.appendChild(romanNumeral);
+                item.appendChild(chordNote);
+                container.appendChild(item);
+            });
+        }
+
+        function updateDisplay() {
+            const key = keySelect.value;
+            let chords;
+
+            if (currentMode === 'major') {
+                chords = getMajorChords(key);
+            } else {
+                chords = getMinorChords(key);
+            }
+
+            renderChords(mainChordsGrid, chords.mainChords);
+            renderChords(secondaryVGrid, chords.secondaryDominants);
+            renderChords(secondaryIvGrid, chords.modalInterchange);
+            renderChords(neapolitanGrid, chords.neapolitan);
+
+            updateTitles();
+            updateTips();
+        }
+
+        // Event listeners
+        majorBtn.addEventListener('click', () => {
+            currentMode = 'major';
+            majorBtn.classList.add('active');
+            minorBtn.classList.remove('active');
+            updateDisplay();
+        });
+
+        minorBtn.addEventListener('click', () => {
+            currentMode = 'minor';
+            minorBtn.classList.add('active');
+            majorBtn.classList.remove('active');
+            updateDisplay();
+        });
+
+        keySelect.addEventListener('change', updateDisplay);
+
+        window.onload = updateDisplay;
+    </script>
+</body>
+
+</html>
