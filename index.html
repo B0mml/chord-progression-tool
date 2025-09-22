@@ -105,7 +105,7 @@
             border-radius: 0.5rem;
             font-weight: 700;
             text-align: center;
-            min-width: 75px;
+            min-width: 85px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             position: relative;
             padding-top: 1.5rem;
@@ -119,6 +119,7 @@
             font-size: 0.75rem;
             font-weight: bold;
             color: #a0a0a0;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -356,28 +357,28 @@
         function updateTips() {
             if (currentMode === 'major') {
                 tipsContent.innerHTML = `
-                    <ul class="list-disc list-inside space-y-2 text-sm text-gray-400">
-                        <li><span class="font-bold text-red-400">Avoid mixing Secondary Dominants</span> within a single progression. They function as temporary transitions rather than part of the main chord progression.</li>
-                        <li>You can transition from any <strong>Main Chord</strong> to any <strong>Secondary Dominant</strong>.</li>
-                        <li>After a <strong>Secondary Dominant</strong>, you should resolve to its relative <strong>Main Chord</strong>. For example, from <strong>V7/ii</strong> you would go to <strong>ii</strong>.</li>
-                        <li>When using <strong>Modal Interchange</strong> chords, they can lead back to the <strong>I</strong>, <strong>IV</strong>, or <strong>V</strong> chords in the main key.</li>
-                        <li>You can also move from any <strong>Main Chord</strong> to a <strong>Modal Interchange</strong> chord, and then back again.</li>
-                        <li>It's ok to <strong>mix</strong> modal interchange chords, as they all come from the same parallel key.</li>
-                    </ul>
-                `;
+                        <ul class="list-disc list-inside space-y-2 text-sm text-gray-400">
+                            <li><span class="font-bold text-red-400">Avoid mixing Secondary Dominants</span> within a single progression. They function as temporary transitions rather than part of the main chord progression.</li>
+                            <li>You can transition from any <strong>Main Chord</strong> to any <strong>Secondary Dominant</strong>.</li>
+                            <li>After a <strong>Secondary Dominant</strong>, you should resolve to its relative <strong>Main Chord</strong>. For example, from <strong>V7/ii</strong> you would go to <strong>ii</strong>.</li>
+                            <li>When using <strong>Modal Interchange</strong> chords, they can lead back to the <strong>I</strong>, <strong>IV</strong>, or <strong>V</strong> chords in the main key.</li>
+                            <li>You can also move from any <strong>Main Chord</strong> to a <strong>Modal Interchange</strong> chord, and then back again.</li>
+                            <li>It's ok to <strong>mix</strong> modal interchange chords, as they all come from the same parallel key.</li>
+                        </ul>
+                    `;
             } else {
                 tipsContent.innerHTML = `
-                    <ul class="list-disc list-inside space-y-2 text-sm text-gray-400">
-                        <li><strong>Secondary Diminished V:</strong> These chords (like vii°7/V) create strong pull to the <strong>V7</strong> chord. For example, in A minor: D#°7 → E7 → Am.</li>
-                        <li><strong>Secondary Diminished iv:</strong> These chords lead to the <strong>iv</strong> chord. For example, in A minor: G#°7 → Dm.</li>
-                        <li>The <strong>♭VI</strong> chord (like F in A minor) is very common and can lead back to <strong>i</strong>, <strong>iv</strong>, or <strong>V7</strong>.</li>
-                        <li>The <strong>Neapolitan 6th</strong> (♭II6) is typically used before <strong>V7</strong>. In A minor: Bb6 → E7 → Am.</li>
-                        <li><strong>Common progressions:</strong> i - ♭VI - ♭VII - i, i - iv - V7 - i, i - ♭II6 - V7 - i</li>
-                        <li>The <strong>raised 7th degree</strong> in harmonic minor creates the leading tone, making V7 → i resolution stronger.</li>
-                        <li>You can mix chords from natural minor (♭VII) with harmonic minor (V7) for variety.</li>
-                        <li><strong>Circle of fifths:</strong> iv - ♭VII - ♭III - ♭VI works well in minor keys.</li>
-                    </ul>
-                `;
+                        <ul class="list-disc list-inside space-y-2 text-sm text-gray-400">
+                            <li><strong>Secondary Diminished V:</strong> These chords (like vii°7/V) create strong pull to the <strong>V7</strong> chord. For example, in A minor: D#°7 → E7 → Am.</li>
+                            <li><strong>Secondary Diminished iv:</strong> These chords lead to the <strong>iv</strong> chord. For example, in A minor: G#°7 → Dm.</li>
+                            <li>The <strong>♭VI</strong> chord (like F in A minor) is very common and can lead back to <strong>i</strong>, <strong>iv</strong>, or <strong>V7</strong>.</li>
+                            <li>The <strong>Neapolitan 6th</strong> (♭II6) is typically used before <strong>V7</strong>. In A minor: Bb6 → E7 → Am.</li>
+                            <li><strong>Common progressions:</strong> i - ♭VI - ♭VII - i, i - iv - V7 - i, i - ♭II6 - V7 - i</li>
+                            <li>The <strong>raised 7th degree</strong> in harmonic minor creates the leading tone, making V7 → i resolution stronger.</li>
+                            <li>You can mix chords from natural minor (♭VII) with harmonic minor (V7) for variety.</li>
+                            <li><strong>Circle of fifths:</strong> iv - ♭VII - ♭III - ♭VI works well in minor keys.</li>
+                        </ul>
+                    `;
             }
         }
 
