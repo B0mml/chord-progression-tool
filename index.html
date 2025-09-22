@@ -35,6 +35,7 @@
             gap: 2rem;
             margin-bottom: 2rem;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .controls label {
@@ -124,7 +125,7 @@
     </style>
 </head>
 
-<body class="bg-gray-900 text-white">
+<body>
 
     <div class="container mx-auto p-6">
         <div class="controls">
@@ -172,34 +173,20 @@
             <div id="secondary-iv-grid" class="chord-grid"></div>
         </div>
 
-        <div class="chord-section">
-            <div class="chord-title" id="neapolitan-title">Neapolitan 6th</div>
-            <div id="neapolitan-grid" class="chord-grid"></div>
-        </div>
-
-        <!-- Tips Section -->
         <div class="chord-section mt-6">
             <div class="chord-title">Tips</div>
-            <div id="tips-content">
-                <!-- Tips will be populated by JavaScript -->
-            </div>
+            <div id="tips-content"></div>
         </div>
     </div>
 
     <script>
         const keySelect = document.getElementById('key-select');
-        const majorBtn = document.getElementById('major-btn');
-        const minorBtn = document.getElementById('minor-btn');
         const mainChordsGrid = document.getElementById('main-chords-grid');
         const secondaryVGrid = document.getElementById('secondary-v-grid');
         const secondaryIvGrid = document.getElementById('secondary-iv-grid');
-        const neapolitanGrid = document.getElementById('neapolitan-grid');
         const tipsContent = document.getElementById('tips-content');
-
-        // Title elements
-        const secondaryVTitle = document.getElementById('secondary-v-title');
-        const secondaryIvTitle = document.getElementById('secondary-iv-title');
-        const neapolitanTitle = document.getElementById('neapolitan-title');
+        const majorBtn = document.getElementById('major-btn');
+        const minorBtn = document.getElementById('minor-btn');
 
         let currentMode = 'major';
 
@@ -240,146 +227,62 @@
         };
 
         function simplify(note) {
-            const enharmonicMap = {
-                'E#': 'F', 'Cb': 'B', 'B#': 'C', 'Fb': 'E',
-                'Bb': 'A#', 'Eb': 'D#', 'Ab': 'G#', 'Db': 'C#', 'Gb': 'F#',
-                'Bbb': 'A', 'Ebb': 'D'
-            };
+            const enharmonicMap = { 'E#': 'F', 'Cb': 'B', 'B#': 'C', 'Fb': 'E', 'Bbb': 'A', 'Ebb': 'D' };
             return enharmonicMap[note] || note;
         }
 
         function getDominantSeventh(note) {
             const index = chromaticScale.indexOf(simplify(note));
             const dominantIndex = (index + 7) % 12;
-            const dominantNote = chromaticScale[dominantIndex];
-            return `${dominantNote}7`;
-        }
-
-        function getDiminishedSeventh(note) {
-            const baseNote = simplify(note);
-            return baseNote + '°7';
-        }
-
-        function getNeapolitanSixth(key) {
-            const tonic = chromaticScale.indexOf(simplify(key));
-            const flatII = chromaticScale[(tonic + 1) % 12];
-            return flatII + '6'; // Neapolitan 6th
+            return `${chromaticScale[dominantIndex]}7`;
         }
 
         function getMajorChords(key) {
-            const majorScaleNotes = majorScales[key];
-            const minorScaleNotes = minorScales[key];
+            const scale = majorScales[key];
+            const minorScale = minorScales[key];
 
             const mainChords = [
-                { note: majorScaleNotes[0], numeral: 'I' },
-                { note: majorScaleNotes[1] + 'm', numeral: 'ii' },
-                { note: majorScaleNotes[2] + 'm', numeral: 'iii' },
-                { note: majorScaleNotes[3], numeral: 'IV' },
-                { note: majorScaleNotes[4], numeral: 'V' },
-                { note: majorScaleNotes[5] + 'm', numeral: 'vi' }
+                { note: scale[0], numeral: 'I' },
+                { note: scale[1] + 'm', numeral: 'ii' },
+                { note: scale[2] + 'm', numeral: 'iii' },
+                { note: scale[3], numeral: 'IV' },
+                { note: scale[4], numeral: 'V' },
+                { note: scale[5] + 'm', numeral: 'vi' }
             ];
 
             const secondaryDominants = [
-                { note: getDominantSeventh(majorScaleNotes[0]), numeral: 'V7/I' },
-                { note: getDominantSeventh(majorScaleNotes[1]), numeral: 'V7/ii' },
-                { note: getDominantSeventh(majorScaleNotes[2]), numeral: 'V7/iii' },
-                { note: getDominantSeventh(majorScaleNotes[3]), numeral: 'V7/IV' },
-                { note: getDominantSeventh(majorScaleNotes[4]), numeral: 'V7/V' },
-                { note: getDominantSeventh(majorScaleNotes[5]), numeral: 'V7/vi' }
+                { note: getDominantSeventh(scale[0]), numeral: 'V7/I' },
+                { note: getDominantSeventh(scale[1]), numeral: 'V7/ii' },
+                { note: getDominantSeventh(scale[2]), numeral: 'V7/iii' },
+                { note: getDominantSeventh(scale[3]), numeral: 'V7/IV' },
+                { note: getDominantSeventh(scale[4]), numeral: 'V7/V' },
+                { note: getDominantSeventh(scale[5]), numeral: 'V7/vi' }
             ];
 
             const modalInterchange = [
-                { note: minorScaleNotes[2], numeral: '♭III' },
-                { note: minorScaleNotes[5], numeral: '♭VI' },
-                { note: minorScaleNotes[3] + 'm', numeral: 'iv' },
-                { note: minorScaleNotes[6], numeral: '♭VII' }
+                { note: minorScale[2], numeral: '♭III' },
+                { note: minorScale[5], numeral: '♭VI' },
+                { note: minorScale[3] + 'm', numeral: 'iv' },
+                { note: minorScale[6], numeral: '♭VII' }
             ];
 
-            const neapolitan = [];
-
-            return { mainChords, secondaryDominants, modalInterchange, neapolitan };
+            return { mainChords, secondaryDominants, modalInterchange };
         }
 
         function getMinorChords(key) {
-            const naturalMinor = minorScales[key];
-            const tonicIndex = chromaticScale.indexOf(simplify(key));
+            const scale = minorScales[key];
 
             const mainChords = [
-                { note: naturalMinor[0] + 'm', numeral: 'i' },
-                { note: naturalMinor[1] + '°', numeral: 'ii°' },
-                { note: naturalMinor[2] + '+', numeral: 'III+' },
-                { note: naturalMinor[3] + 'm', numeral: 'iv' },
-                { note: getDominantSeventh(naturalMinor[4]), numeral: 'V7' },
-                { note: naturalMinor[5], numeral: '♭VI' },
-                { note: naturalMinor[6], numeral: '♭VII' }
+                { note: scale[0] + 'm', numeral: 'i' },
+                { note: scale[1] + '°', numeral: 'ii°' },
+                { note: scale[2], numeral: 'III' },
+                { note: scale[3] + 'm', numeral: 'iv' },
+                { note: scale[4], numeral: 'V' },
+                { note: scale[5], numeral: 'VI' },
+                { note: scale[6], numeral: 'VII' }
             ];
 
-            // Secondary diminished V
-            const fourthDegreeSharp = chromaticScale[(tonicIndex + 6) % 12];
-            const secondaryDimV = [
-                { note: getDiminishedSeventh(fourthDegreeSharp), numeral: 'vii°7/V' }
-            ];
-
-            // Secondary diminished iv + bVI
-            const thirdDegreeSharp = chromaticScale[(tonicIndex + 4) % 12];
-            const secondaryDimIv = [
-                { note: getDiminishedSeventh(thirdDegreeSharp), numeral: 'vii°7/iv' },
-                { note: naturalMinor[5], numeral: '♭VI' }
-            ];
-
-            // Neapolitan 6th
-            const neapolitan = [
-                { note: getNeapolitanSixth(key), numeral: '♭II6' }
-            ];
-
-            return {
-                mainChords,
-                secondaryDominants: secondaryDimV,
-                modalInterchange: secondaryDimIv,
-                neapolitan
-            };
-        }
-
-        function updateTitles() {
-            if (currentMode === 'major') {
-                secondaryVTitle.textContent = 'Secondary Dominants';
-                secondaryIvTitle.textContent = 'Modal Interchange';
-                neapolitanTitle.textContent = '';
-                neapolitanGrid.parentElement.style.display = 'none';
-            } else {
-                secondaryVTitle.textContent = 'Secondary Diminished V';
-                secondaryIvTitle.textContent = 'Secondary Diminished iv, ♭VI';
-                neapolitanTitle.textContent = 'Neapolitan 6th';
-                neapolitanGrid.parentElement.style.display = 'block';
-            }
-        }
-
-        function updateTips() {
-            if (currentMode === 'major') {
-                tipsContent.innerHTML = `
-                        <ul class="list-disc list-inside space-y-2 text-sm text-gray-400">
-                            <li><span class="font-bold text-red-400">Avoid mixing Secondary Dominants</span> within a single progression. They function as temporary transitions rather than part of the main chord progression.</li>
-                            <li>You can transition from any <strong>Main Chord</strong> to any <strong>Secondary Dominant</strong>.</li>
-                            <li>After a <strong>Secondary Dominant</strong>, you should resolve to its relative <strong>Main Chord</strong>. For example, from <strong>V7/ii</strong> you would go to <strong>ii</strong>.</li>
-                            <li>When using <strong>Modal Interchange</strong> chords, they can lead back to the <strong>I</strong>, <strong>IV</strong>, or <strong>V</strong> chords in the main key.</li>
-                            <li>You can also move from any <strong>Main Chord</strong> to a <strong>Modal Interchange</strong> chord, and then back again.</li>
-                            <li>It's ok to <strong>mix</strong> modal interchange chords, as they all come from the same parallel key.</li>
-                        </ul>
-                    `;
-            } else {
-                tipsContent.innerHTML = `
-                        <ul class="list-disc list-inside space-y-2 text-sm text-gray-400">
-                            <li><strong>Secondary Diminished V:</strong> These chords (like vii°7/V) create strong pull to the <strong>V7</strong> chord. For example, in A minor: D#°7 → E7 → Am.</li>
-                            <li><strong>Secondary Diminished iv:</strong> These chords lead to the <strong>iv</strong> chord. For example, in A minor: G#°7 → Dm.</li>
-                            <li>The <strong>♭VI</strong> chord (like F in A minor) is very common and can lead back to <strong>i</strong>, <strong>iv</strong>, or <strong>V7</strong>.</li>
-                            <li>The <strong>Neapolitan 6th</strong> (♭II6) is typically used before <strong>V7</strong>. In A minor: Bb6 → E7 → Am.</li>
-                            <li><strong>Common progressions:</strong> i - ♭VI - ♭VII - i, i - iv - V7 - i, i - ♭II6 - V7 - i</li>
-                            <li>The <strong>raised 7th degree</strong> in harmonic minor creates the leading tone, making V7 → i resolution stronger.</li>
-                            <li>You can mix chords from natural minor (♭VII) with harmonic minor (V7) for variety.</li>
-                            <li><strong>Circle of fifths:</strong> iv - ♭VII - ♭III - ♭VI works well in minor keys.</li>
-                        </ul>
-                    `;
-            }
+            return { mainChords, secondaryDominants: [], modalInterchange: [] };
         }
 
         function renderChords(container, chords) {
@@ -388,39 +291,68 @@
                 const item = document.createElement('div');
                 item.className = 'chord-item';
 
-                const romanNumeral = document.createElement('div');
-                romanNumeral.className = 'chord-roman';
-                romanNumeral.textContent = chord.numeral;
+                const roman = document.createElement('div');
+                roman.className = 'chord-roman';
+                roman.textContent = chord.numeral;
 
-                const chordNote = document.createElement('span');
-                chordNote.textContent = chord.note;
+                const note = document.createElement('span');
+                note.textContent = chord.note;
 
-                item.appendChild(romanNumeral);
-                item.appendChild(chordNote);
+                item.appendChild(roman);
+                item.appendChild(note);
                 container.appendChild(item);
             });
         }
 
+        function updateTips() {
+            if (currentMode === 'major') {
+                tipsContent.innerHTML = `
+                    <ul class="list-disc list-inside space-y-2 text-sm text-gray-400">
+                        <li>Major progressions are easy: try I-IV-V-I.</li>
+                        <li>You can add secondary dominants for variation (V7/ii, etc.).</li>
+                        <li>Modal interchange chords (♭III, ♭VI, iv, ♭VII) add color.</li>
+                    </ul>
+                `;
+            } else {
+                tipsContent.innerHTML = `
+                    <ul class="list-disc list-inside space-y-2 text-sm text-gray-400">
+                        <li>Minor progressions are simple: try i-iv-v-i.</li>
+                        <li>Use III, VI, VII to create smooth, playable progressions.</li>
+                         <li>The v chord is actually <strong>minor</strong> but often played as <strong>major</strong> or <strong>maj7</strong> for a stronger resolution.</li>
+                    </ul>
+                `;
+            }
+        }
+
         function updateDisplay() {
             const key = keySelect.value;
-            let chords;
+            let chords = currentMode === 'major' ? getMajorChords(key) : getMinorChords(key);
 
-            if (currentMode === 'major') {
-                chords = getMajorChords(key);
-            } else {
-                chords = getMinorChords(key);
-            }
+            const secondaryVSection = secondaryVGrid.parentElement;
+            const secondaryIvSection = secondaryIvGrid.parentElement;
 
             renderChords(mainChordsGrid, chords.mainChords);
-            renderChords(secondaryVGrid, chords.secondaryDominants);
-            renderChords(secondaryIvGrid, chords.modalInterchange);
-            renderChords(neapolitanGrid, chords.neapolitan);
 
-            updateTitles();
+            if (chords.secondaryDominants.length > 0) {
+                secondaryVSection.style.display = 'block';
+                renderChords(secondaryVGrid, chords.secondaryDominants);
+            } else {
+                secondaryVSection.style.display = 'none';
+            }
+
+            if (chords.modalInterchange.length > 0) {
+                secondaryIvSection.style.display = 'block';
+                renderChords(secondaryIvGrid, chords.modalInterchange);
+            } else {
+                secondaryIvSection.style.display = 'none';
+            }
+
             updateTips();
         }
 
         // Event listeners
+        keySelect.addEventListener('change', updateDisplay);
+
         majorBtn.addEventListener('click', () => {
             currentMode = 'major';
             majorBtn.classList.add('active');
@@ -434,8 +366,6 @@
             majorBtn.classList.remove('active');
             updateDisplay();
         });
-
-        keySelect.addEventListener('change', updateDisplay);
 
         window.onload = updateDisplay;
     </script>
